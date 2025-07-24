@@ -5,24 +5,31 @@
  * @format
  */
 
-import { NewAppScreen } from '@react-native/new-app-screen';
-import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
+import * as React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import WelcomeScreen, { RootStackParamList } from './src/screens/WelcomeScreen';
+import SignInScreen from './src/screens/SignInScreen';
+import ProfileScreen from './src/screens/ProfileScreen';
+import LocationsScreen from './src/screens/LocationsScreen';
+import OpponentsScreen from './src/screens/OpponentsScreen';
+import ScheduleScreen from './src/screens/ScheduleScreen';
+
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 function App() {
-  const isDarkMode = useColorScheme() === 'dark';
-
   return (
-    <View style={styles.container}>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <NewAppScreen templateFileName="App.tsx" />
-    </View>
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="Welcome">
+        <Stack.Screen name="Welcome" component={WelcomeScreen} />
+        <Stack.Screen name="SignIn" component={SignInScreen} />
+        <Stack.Screen name="Profile" component={ProfileScreen} />
+        <Stack.Screen name="Locations" component={LocationsScreen} />
+        <Stack.Screen name="Opponents" component={OpponentsScreen} />
+        <Stack.Screen name="Schedule" component={ScheduleScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});
 
 export default App;
