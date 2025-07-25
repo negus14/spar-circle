@@ -1,5 +1,8 @@
 import React from 'react';
-import { View, Text, StyleSheet, FlatList } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { RootStackParamList } from './WelcomeScreen';
 
 const schedule = [
   { id: '1', date: '2024-07-25', time: '18:00', location: 'Downtown Gym' },
@@ -7,6 +10,7 @@ const schedule = [
 ];
 
 const ScheduleScreen = () => {
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Sparring Schedule</Text>
@@ -14,7 +18,11 @@ const ScheduleScreen = () => {
         data={schedule}
         keyExtractor={item => item.id}
         renderItem={({ item }) => (
-          <Text style={styles.item}>{item.date} {item.time} - {item.location}</Text>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('Opponents', { booking: item })}
+          >
+            <Text style={styles.item}>{item.date} {item.time} - {item.location}</Text>
+          </TouchableOpacity>
         )}
       />
     </View>

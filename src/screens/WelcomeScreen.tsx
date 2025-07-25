@@ -6,6 +6,8 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 export type RootStackParamList = {
   Welcome: undefined;
   Main: undefined;
+  Opponents: { booking: { id: string; date: string; time: string; location: string } } | undefined;
+  Profile: { club?: { id: string; name: string; latitude: number; longitude: number }; opponent?: { id: string; name: string; skill: string; height: number; weight: number; reach: number } } | undefined;
   // ...other screens
 };
 
@@ -14,7 +16,7 @@ const WelcomeScreen = () => {
 
   return (
     <ImageBackground
-      source={require('C:/Users/Abel/ReactNative/Spar-ring-app/src/assets/sparring_background.png')} // Replace with your actual image path
+      source={require('../assets/sparring_background.png')} // Replace with your actual image path
       style={styles.background}
       resizeMode="cover"
     >
