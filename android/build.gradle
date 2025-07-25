@@ -19,3 +19,8 @@ buildscript {
 }
 
 apply plugin: "com.facebook.react.rootproject"
+
+android {
+    namespace 'com.sparringapp'
+    // ... other config ...
+}
