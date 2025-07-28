@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, Button, TextInput, TouchableOpacity } from 'react-native';
+import React, { useState, useLayoutEffect } from 'react';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Modal, TextInput, Button } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from './WelcomeScreen';
@@ -14,12 +14,23 @@ const opponents = [
 
 const OpponentsScreen = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const [modalVisible, setModalVisible] = useState(false);
   const [minHeight, setMinHeight] = useState('');
   const [maxHeight, setMaxHeight] = useState('');
   const [minWeight, setMinWeight] = useState('');
   const [maxWeight, setMaxWeight] = useState('');
   const [minReach, setMinReach] = useState('');
   const [maxReach, setMaxReach] = useState('');
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity onPress={() => setModalVisible(true)} style={{ marginRight: 16 }}>
+          <Text style={{ color: '#007AFF', fontWeight: 'bold' }}>Filter</Text>
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation]);
 
   const filteredOpponents = opponents.filter(o => {
     const h = o.height, w = o.weight, r = o.reach;
@@ -35,75 +46,77 @@ const OpponentsScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Opponents</Text>
-      <View style={styles.filterRow}>
-        <View style={styles.filterGroup}>
-          <Text style={styles.filterLabel}>Height</Text>
-          <View style={styles.filterInputsRow}>
-            <TextInput
-              style={styles.filterInput}
-              placeholder="Min"
-              value={minHeight}
-              onChangeText={setMinHeight}
-              keyboardType="numeric"
-            />
-            <TextInput
-              style={styles.filterInput}
-              placeholder="Max"
-              value={maxHeight}
-              onChangeText={setMaxHeight}
-              keyboardType="numeric"
-            />
-          </View>
-        </View>
-        <View style={styles.filterGroup}>
-          <Text style={styles.filterLabel}>Weight</Text>
-          <View style={styles.filterInputsRow}>
-            <TextInput
-              style={styles.filterInput}
-              placeholder="Min"
-              value={minWeight}
-              onChangeText={setMinWeight}
-              keyboardType="numeric"
-            />
-            <TextInput
-              style={styles.filterInput}
-              placeholder="Max"
-              value={maxWeight}
-              onChangeText={setMaxWeight}
-              keyboardType="numeric"
-            />
-          </View>
-        </View>
-        <View style={styles.filterGroup}>
-          <Text style={styles.filterLabel}>Reach</Text>
-          <View style={styles.filterInputsRow}>
-            <TextInput
-              style={styles.filterInput}
-              placeholder="Min"
-              value={minReach}
-              onChangeText={setMinReach}
-              keyboardType="numeric"
-            />
-            <TextInput
-              style={styles.filterInput}
-              placeholder="Max"
-              value={maxReach}
-              onChangeText={setMaxReach}
-              keyboardType="numeric"
-            />
-          </View>
-        </View>
-      </View>
       <FlatList
         data={filteredOpponents}
         keyExtractor={item => item.id}
+        numColumns={4}
+        columnWrapperStyle={styles.row}
         renderItem={({ item }) => (
-          <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('Profile', { opponent: item })}>
+          <TouchableOpacity style={styles.squareCard} onPress={() => navigation.navigate('Profile', { opponent: item })}>
             <Text style={styles.cardName}>{item.name}</Text>
           </TouchableOpacity>
         )}
       />
+      <Modal visible={modalVisible} animationType="slide" transparent>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Filter Opponents</Text>
+            <View style={styles.filterRow}>
+              <Text style={styles.filterLabel}>Height</Text>
+              <TextInput
+                style={styles.filterInput}
+                placeholder="Min"
+                value={minHeight}
+                onChangeText={setMinHeight}
+                keyboardType="numeric"
+              />
+              <TextInput
+                style={styles.filterInput}
+                placeholder="Max"
+                value={maxHeight}
+                onChangeText={setMaxHeight}
+                keyboardType="numeric"
+              />
+            </View>
+            <View style={styles.filterRow}>
+              <Text style={styles.filterLabel}>Weight</Text>
+              <TextInput
+                style={styles.filterInput}
+                placeholder="Min"
+                value={minWeight}
+                onChangeText={setMinWeight}
+                keyboardType="numeric"
+              />
+              <TextInput
+                style={styles.filterInput}
+                placeholder="Max"
+                value={maxWeight}
+                onChangeText={setMaxWeight}
+                keyboardType="numeric"
+              />
+            </View>
+            <View style={styles.filterRow}>
+              <Text style={styles.filterLabel}>Reach</Text>
+              <TextInput
+                style={styles.filterInput}
+                placeholder="Min"
+                value={minReach}
+                onChangeText={setMinReach}
+                keyboardType="numeric"
+              />
+              <TextInput
+                style={styles.filterInput}
+                placeholder="Max"
+                value={maxReach}
+                onChangeText={setMaxReach}
+                keyboardType="numeric"
+              />
+            </View>
+            <Button title="Apply" onPress={() => setModalVisible(false)} />
+            <Button title="Close" color="#888" onPress={() => setModalVisible(false)} />
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -127,23 +140,33 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   item: { fontSize: 18, padding: 8 },
-  card: {
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  squareCard: {
     backgroundColor: '#fff',
-    borderRadius: 6,
+    borderRadius: 8,
     borderWidth: 1,
     borderColor: '#eee',
-    padding: 16,
-    marginVertical: 6,
-    marginHorizontal: 4,
     alignItems: 'center',
     justifyContent: 'center',
     elevation: 1,
+    width: '22%', // 4 per row with spacing
+    aspectRatio: 1,
+    marginHorizontal: '1%',
   },
   cardName: {
     fontSize: 18,
     color: '#222',
     fontWeight: 'bold',
   },
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.3)', justifyContent: 'center', alignItems: 'center' },
+  modalContent: { backgroundColor: '#fff', borderRadius: 10, padding: 24, width: '80%' },
+  modalTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 16, textAlign: 'center' },
+  filterRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 12, justifyContent: 'space-between' },
+  input: { borderWidth: 1, borderColor: '#ccc', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 4, fontSize: 14, width: 60, marginHorizontal: 4, textAlign: 'center' },
 });
 
 export default OpponentsScreen; 

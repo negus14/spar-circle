@@ -13,7 +13,7 @@ const ScheduleScreen = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Sparring Schedule</Text>
+      <Text style={styles.title}>Schedule</Text>
       <FlatList
         data={schedule}
         keyExtractor={item => item.id}

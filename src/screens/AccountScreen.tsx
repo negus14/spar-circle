@@ -1,6 +1,7 @@
-import React from 'react';
-import { View, TouchableOpacity, Text, StyleSheet, FlatList, Alert } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, TouchableOpacity, Text, StyleSheet, FlatList, Alert, Dimensions } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons'; // If you see a type error, install @types/react-native-vector-icons or ignore for JS
+import { useNavigation } from '@react-navigation/native';
 
 const options = [
   { key: 'Profile', icon: 'person' },
@@ -16,9 +17,27 @@ const options = [
 ];
 
 const AccountScreen = () => {
+  const navigation = useNavigation();
+  const [numColumns, setNumColumns] = useState(4);
+
+  useEffect(() => {
+    const updateColumns = () => {
+      const screenWidth = Dimensions.get('window').width;
+      // Example: minimum card width 90, with some margin
+      const columns = Math.floor(screenWidth / 90);
+      setNumColumns(columns > 1 ? columns : 1);
+    };
+    updateColumns();
+    const subscription = Dimensions.addEventListener('change', updateColumns);
+    return () => subscription?.remove && subscription.remove();
+  }, []);
+
   const handlePress = (key: string) => {
-    // Add navigation or action logic here
-    Alert.alert(key);
+    if (key === 'Profile') {
+      (navigation as any).navigate('Profile', {});
+    } else {
+      Alert.alert(key);
+    }
   };
 
   return (
@@ -26,13 +45,14 @@ const AccountScreen = () => {
       <FlatList
         data={options}
         keyExtractor={item => item.key}
+        numColumns={4}
+        columnWrapperStyle={styles.row}
         renderItem={({ item }) => (
-          <TouchableOpacity style={styles.item} onPress={() => handlePress(item.key)}>
+          <TouchableOpacity style={styles.card} onPress={() => handlePress(item.key)}>
             <Ionicons name={item.icon} size={24} color="#333" style={styles.icon} />
             <Text style={styles.text}>{item.key}</Text>
           </TouchableOpacity>
         )}
-        ItemSeparatorComponent={() => <View style={styles.separator} />}
       />
     </View>
   );
@@ -44,24 +64,29 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     paddingVertical: 32,
   },
-  item: {
+  row: {
     flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 18,
-    paddingHorizontal: 24,
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  card: {
     backgroundColor: '#fff',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#eee',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '22%', // 4 per row with spacing
+    aspectRatio: 1,
+    marginHorizontal: '1%',
   },
   icon: {
-    marginRight: 18,
+    marginBottom: 6,
   },
   text: {
-    fontSize: 18,
+    fontSize: 13,
     color: '#222',
-  },
-  separator: {
-    height: 1,
-    backgroundColor: '#eee',
-    marginLeft: 24,
+    textAlign: 'center',
   },
 });
 
