@@ -11,6 +11,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import WelcomeScreen, { RootStackParamList } from './src/screens/WelcomeScreen';
 import SignInScreen from './src/screens/SignInScreen';
 import BottomTabNavigator from './src/navigation/BottomTabNavigator';
+import ProfileScreen from './src/screens/ProfileScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -21,6 +22,7 @@ function App() {
         <Stack.Screen name="Welcome" component={WelcomeScreen} options={{ headerShown: false }}/>
         <Stack.Screen name="SignIn" component={SignInScreen} options={{ headerShown: false }}/>
         <Stack.Screen name="Main" component={BottomTabNavigator} options={{ headerShown: false }}/>
+        <Stack.Screen name="Profile" component={ProfileScreen} options={{ headerShown: true }}/>
         {/* <Stack.Screen name="Locations" component={VenueScreen} options={{ headerShown: false }}/>
         <Stack.Screen name="Opponents" component={OpponentsScreen} options={{ headerShown: false }}/>
         <Stack.Screen name="Schedule" component={ScheduleScreen} options={{ headerShown: false }}/> */}

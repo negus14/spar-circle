@@ -34,7 +34,7 @@ const AccountScreen = () => {
 
   const handlePress = (key: string) => {
     if (key === 'Profile') {
-      (navigation as any).navigate('Profile', {});
+      navigation.navigate('Profile' as never);
     } else {
       Alert.alert(key);
     }

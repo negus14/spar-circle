@@ -1,9 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import { View, TouchableOpacity, Text, Alert, StyleSheet, Image, ScrollView } from 'react-native';
-import { useRoute } from '@react-navigation/native';
+import { View, TouchableOpacity, Text, Alert, StyleSheet, Image, ScrollView, TextInput } from 'react-native';
+import { useRoute, useNavigation } from '@react-navigation/native';
 
 const ProfileScreen = () => {
   const route = useRoute() as any;
+  const navigation = useNavigation();
+  React.useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity onPress={() => Alert.alert('Edit profile coming soon!')} style={{ marginRight: 16 }}>
+          <Text style={{ color: '#007AFF', fontWeight: 'bold' }}>Edit</Text>
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation]);
   // Example mock data – replace with real user input later
   const user = {
     fullName: 'John Doe',
@@ -52,6 +62,25 @@ const ProfileScreen = () => {
     : user;
 
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
+  const [editMode, setEditMode] = useState(false);
+  const [fields, setFields] = useState(display);
+
+  React.useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity
+          onPress={() => setEditMode((prev) => !prev)}
+          style={{ marginRight: 16 }}
+        >
+          <Text style={{ color: '#007AFF', fontWeight: 'bold' }}>{editMode ? 'Save' : 'Edit'}</Text>
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation, editMode]);
+
+  const handleFieldChange = (key: string, value: string) => {
+    setFields((prev) => ({ ...prev, [key]: value }));
+  };
 
   return (
     <ScrollView style={styles.container}>
@@ -61,47 +90,56 @@ const ProfileScreen = () => {
           style={{ width: 80, height: 80, borderRadius: 40, marginBottom: 24 }}
         />
       )}
-      <Text style={styles.header}>🥊Sparring Profile</Text>
+      <Text style={styles.header}>Profile</Text>
 
       {/* Section 1: Personal Information */}
       <Text style={styles.sectionTitle}>1. Personal Information</Text>
-      <Field label="Full Name" value={display.fullName} />
-      <Field label="Date of Birth / Age" value={display.dob} />
-      <Field label="Gender" value={display.gender} />
-      <Field label="Weight" value={display.weight} />
-      <Field label="Height & Reach" value={`${display.height} / ${display.reach}`} />
+      <EditableField label="Full Name" value={fields.fullName} editable={editMode} onChange={v => handleFieldChange('fullName', v)} />
+      <EditableField label="Date of Birth / Age" value={fields.dob} editable={editMode} onChange={v => handleFieldChange('dob', v)} />
+      <EditableField label="Gender" value={fields.gender} editable={editMode} onChange={v => handleFieldChange('gender', v)} />
+      <EditableField label="Weight" value={fields.weight} editable={editMode} onChange={v => handleFieldChange('weight', v)} />
+      <EditableField label="Height" value={fields.height} editable={editMode} onChange={v => handleFieldChange('height', v)} />
+      <EditableField label="Reach" value={fields.reach} editable={editMode} onChange={v => handleFieldChange('reach', v)} />
 
       {/* Section 2: Boxing Experience */}
       <Text style={styles.sectionTitle}>2. Boxing Experience</Text>
-      <Field label="Experience Level" value={display.experienceLevel} />
-      <Field label="Years Training" value={display.yearsTraining} />
-      <Field label="Sparring History" value={display.sparringHistory} />
-      <Field label="Fight Record" value={display.fightRecord} />
-      <Field label="Boxing Style" value={display.boxingStyle} />
+      <EditableField label="Experience Level" value={fields.experienceLevel} editable={editMode} onChange={v => handleFieldChange('experienceLevel', v)} />
+      <EditableField label="Years Training" value={fields.yearsTraining} editable={editMode} onChange={v => handleFieldChange('yearsTraining', v)} />
+      <EditableField label="Sparring History" value={fields.sparringHistory} editable={editMode} onChange={v => handleFieldChange('sparringHistory', v)} />
+      <EditableField label="Fight Record" value={fields.fightRecord} editable={editMode} onChange={v => handleFieldChange('fightRecord', v)} />
+      <EditableField label="Boxing Style" value={fields.boxingStyle} editable={editMode} onChange={v => handleFieldChange('boxingStyle', v)} />
 
       {/* Section 3: Medical & Safety Info */}
       <Text style={styles.sectionTitle}>3. Medical & Safety Info</Text>
-      <Field label="Medical Clearance" value={display.medicalClearance} />
-      <Field label="Injuries" value={display.injuries} />
-      <Field label="Consent Waiver" value={display.consentWaiver} />
-      <Field label="Gear" value={display.gear} />
+      <EditableField label="Medical Clearance" value={fields.medicalClearance} editable={editMode} onChange={v => handleFieldChange('medicalClearance', v)} />
+      <EditableField label="Injuries" value={fields.injuries} editable={editMode} onChange={v => handleFieldChange('injuries', v)} />
+      <EditableField label="Consent Waiver" value={fields.consentWaiver} editable={editMode} onChange={v => handleFieldChange('consentWaiver', v)} />
+      <EditableField label="Gear" value={fields.gear} editable={editMode} onChange={v => handleFieldChange('gear', v)} />
 
       {/* Section 4: Gym & Supervision */}
       <Text style={styles.sectionTitle}>4. Gym & Supervision</Text>
-      <Field label="Gym Affiliation" value={display.gym} />
-      <Field label="Coach Approval" value={display.coachApproval} />
-      <Field label="Contact Info" value={display.contact} />
+      <EditableField label="Gym Affiliation" value={fields.gym} editable={editMode} onChange={v => handleFieldChange('gym', v)} />
+      <EditableField label="Coach Approval" value={fields.coachApproval} editable={editMode} onChange={v => handleFieldChange('coachApproval', v)} />
+      <EditableField label="Contact Info" value={fields.contact} editable={editMode} onChange={v => handleFieldChange('contact', v)} />
 
       <View style={{ height: 40 }} />
     </ScrollView>
   );
 };
 
-type FieldProps = { label: string; value: string };
-const Field = ({ label, value }: FieldProps) => (
+type EditableFieldProps = { label: string; value: string; editable: boolean; onChange: (v: string) => void };
+const EditableField = ({ label, value, editable, onChange }: EditableFieldProps) => (
   <View style={styles.fieldContainer}>
     <Text style={styles.label}>{label}:</Text>
-    <Text style={styles.value}>{value}</Text>
+    {editable ? (
+      <TextInput
+        style={[styles.value, { backgroundColor: '#222', color: '#fff', borderRadius: 6, paddingHorizontal: 8, marginTop: 2 }]}
+        value={value}
+        onChangeText={onChange}
+      />
+    ) : (
+      <Text style={styles.value}>{value}</Text>
+    )}
   </View>
 );
 
