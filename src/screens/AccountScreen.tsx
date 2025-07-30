@@ -33,10 +33,39 @@ const AccountScreen = () => {
   }, []);
 
   const handlePress = (key: string) => {
-    if (key === 'Profile') {
-      navigation.navigate('Profile' as never);
-    } else {
-      Alert.alert(key);
+    switch (key) {
+      case 'Profile':
+        navigation.navigate('Profile' as never);
+        break;
+      case 'Followers':
+        navigation.navigate('Followers' as never);
+        break;
+      case 'Wallet':
+        navigation.navigate('Wallet' as never);
+        break;
+      case 'Settings':
+        navigation.navigate('Settings' as never);
+        break;
+      case 'Update Email':
+        navigation.navigate('UpdateEmail' as never);
+        break;
+      case 'Password':
+        navigation.navigate('Password' as never);
+        break;
+      case 'Language':
+        navigation.navigate('Language' as never);
+        break;
+      case 'About':
+        navigation.navigate('About' as never);
+        break;
+      case 'Sign Out':
+        navigation.navigate('SignOut' as never);
+        break;
+      case 'Delete Account':
+        navigation.navigate('DeleteAccount' as never);
+        break;
+      default:
+        Alert.alert(key);
     }
   };
 

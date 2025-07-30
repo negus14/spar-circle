@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { View, TouchableOpacity, Text, Alert, StyleSheet, Image, ScrollView, TextInput } from 'react-native';
+import { View, TouchableOpacity, Text, Alert, StyleSheet, Image, ScrollView, TextInput, ActivityIndicator } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
+import { supabase } from '../supabaseClient'; // adjust path as needed
 
 const ProfileScreen = () => {
   const route = useRoute() as any;
@@ -64,23 +65,111 @@ const ProfileScreen = () => {
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
   const [editMode, setEditMode] = useState(false);
   const [fields, setFields] = useState(display);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      setLoading(true);
+      // Example: fetch profile from supabase
+      const { data, error } = await supabase
+        .from('sparring_profiles')
+        .select('*')
+        .eq('id', '48586985-b0c7-41a3-9cb8-460dfcff25bc') // replace with actual user id logic
+        .single();
+      if (data) {
+        setFields({
+          ...fields,
+          fullName: data.full_name || '',
+          dob: data.dob || '',
+          gender: data.gender || '',
+          weight: data.weight || '',
+          height: data.height || '',
+          reach: data.reach || '',
+          experienceLevel: data.experience_level || '',
+          yearsTraining: data.years_training || '',
+          sparringHistory: data.sparring_history || '',
+          fightRecord: data.fight_record || '',
+          boxingStyle: data.boxing_style || '',
+          medicalClearance: data.medical_clearance || '',
+          injuries: data.injuries || '',
+          consentWaiver: data.consent_waiver || '',
+          gear: data.gear || '',
+          gym: data.gym || '',
+          coachApproval: data.coach_approval || '',
+          contact: data.contact || '',
+        });
+      }
+      setLoading(false);
+    };
+    fetchProfile();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const updateProfile = async () => {
+    setLoading(true);
+    const { error } = await supabase
+      .from('profiles')
+      .update({
+        full_name: fields.fullName,
+        dob: fields.dob,
+        gender: fields.gender,
+        weight: fields.weight,
+        height: fields.height,
+        reach: fields.reach,
+        experience_level: fields.experienceLevel,
+        years_training: fields.yearsTraining,
+        sparring_history: fields.sparringHistory,
+        fight_record: fields.fightRecord,
+        boxing_style: fields.boxingStyle,
+        medical_clearance: fields.medicalClearance,
+        injuries: fields.injuries,
+        consent_waiver: fields.consentWaiver,
+        gear: fields.gear,
+        gym: fields.gym,
+        coach_approval: fields.coachApproval,
+        contact: fields.contact,
+      })
+      .eq('id', '48586985-b0c7-41a3-9cb8-460dfcff25bc'); // Replace with actual user id logic
+
+    setLoading(false);
+    if (error) {
+      Alert.alert('Error', 'Failed to update profile.');
+    } else {
+      setEditMode(false);
+      Alert.alert('Success', 'Profile updated!');
+    }
+  };
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
         <TouchableOpacity
-          onPress={() => setEditMode((prev) => !prev)}
+          onPress={async () => {
+            if (editMode) {
+              await updateProfile();
+            } else {
+              setEditMode(true);
+            }
+          }}
           style={{ marginRight: 16 }}
         >
           <Text style={{ color: '#007AFF', fontWeight: 'bold' }}>{editMode ? 'Save' : 'Edit'}</Text>
         </TouchableOpacity>
       ),
     });
-  }, [navigation, editMode]);
+  }, [navigation, editMode, fields]);
 
   const handleFieldChange = (key: string, value: string) => {
     setFields((prev) => ({ ...prev, [key]: value }));
   };
+
+  if (loading) {
+    return (
+      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}> 
+        <ActivityIndicator size="large" color="#007AFF" />
+      </View>
+    );
+  }
 
   return (
     <ScrollView style={styles.container}>
@@ -90,7 +179,7 @@ const ProfileScreen = () => {
           style={{ width: 80, height: 80, borderRadius: 40, marginBottom: 24 }}
         />
       )}
-      <Text style={styles.header}>Profile</Text>
+      <Text style={styles.header}>🥊Sparring Profile</Text>
 
       {/* Section 1: Personal Information */}
       <Text style={styles.sectionTitle}>1. Personal Information</Text>

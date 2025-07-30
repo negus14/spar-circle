@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Button } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const fights = [
@@ -11,15 +12,19 @@ const fights = [
 const mockBalance = 120.0;
 
 const HomeScreen = () => {
+  const navigation = useNavigation();
   return (
     <View style={styles.container}>
       <View style={styles.headerRow}>
         <Text style={styles.title}>Upcoming Fights</Text>
-        <View style={styles.walletContainer}>
-          <Ionicons name="wallet" size={26} color="#222" />
-          <Text style={styles.walletText}>£{mockBalance.toFixed(2)}</Text>
-        </View>
+        <TouchableOpacity onPress={() => navigation.navigate('Wallet')}>
+          <View style={styles.walletContainer}>
+            <Ionicons name="wallet" size={26} color="#222" />
+            <Text style={styles.walletText}>£{mockBalance.toFixed(2)}</Text>
+          </View>
+        </TouchableOpacity>
       </View>
+      <Button title="Create Fight" onPress={() => navigation.navigate('CreateFight')} />
       {fights.length === 0 ? (
         <Text style={styles.noFights}>No fights scheduled</Text>
       ) : (
